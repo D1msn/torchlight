@@ -1,0 +1,19 @@
+node_modules
+build
+
+./client/node_modules
+./server/node_modules
+
+# Meta
+.idea
+.DS_Store
+*.log
+.env
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/.code-snippets
+.history/
+*.crt
+*.key
