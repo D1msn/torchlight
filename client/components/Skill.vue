@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { ISkill } from "@localServer/models/skill.model";
 
-const { skill } = defineProps<{
+const { skill, onSave } = defineProps<{
   skill: ISkill;
+  onSave: () => void;
 }>();
 
 const checkDiffDateNow = (initDate: string) => {
@@ -15,6 +16,33 @@ const checkDiffDateNow = (initDate: string) => {
 
   if (diff > 1) {
     return true;
+  }
+};
+
+const isEditMode = ref(false);
+const statePrice = defineModel();
+
+const toggleEditMode = () => {
+  isEditMode.value = !isEditMode.value;
+  statePrice.value = skill.price;
+};
+
+const onSavePrice = async () => {
+  const res = await useFetch(`/api/skills/${skill._id}`, {
+    method: "PUT",
+    body: { price: statePrice },
+  });
+
+  isEditMode.value = false;
+
+  if (res.data.value) {
+    onSave?.();
+  }
+};
+
+const onEnter = (e: KeyboardEvent) => {
+  if (e.code === "Enter") {
+    onSavePrice(e);
   }
 };
 </script>
@@ -30,7 +58,17 @@ const checkDiffDateNow = (initDate: string) => {
       </div>
       <div class="skill__priceWrapper">
         <div class="skill__price">
-          {{ skill.price }}
+          <input
+            autofocus
+            type="number"
+            @keydown.enter="onEnter"
+            @blur="onSavePrice"
+            v-model="statePrice"
+            v-if="isEditMode"
+          />
+          <div class="skill__price-text" @click="toggleEditMode" v-else>
+            {{ skill.price }}
+          </div>
           <NuxtImg
             src="https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Item_chuhuoyuanzhiV3_Icon_128.webp"
           />
@@ -86,6 +124,10 @@ const checkDiffDateNow = (initDate: string) => {
     gap: 2px;
     font-size: 16px;
     font-weight: bold;
+
+    &-text {
+      cursor: pointer;
+    }
 
     img {
       display: flex;

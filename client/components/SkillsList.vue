@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import type { ISkill } from "@localServer/models/skill.model";
 
-const skills = await $fetch<ISkill[]>("/skills", {
-  baseURL: "http://localhost:3006/api/v1",
-  method: "GET",
-});
+const { data: skills, refresh } = await useFetch<ISkill[]>("/api/skills");
+
+const onSave = () => {
+  refresh();
+};
 </script>
 
 <template>
   <div class="wrapper" v-if="skills">
-    <Skill v-for="skill in skills" :skill="skill" />
+    <Skill v-for="skill in skills" :skill="skill" :onSave="onSave" />
   </div>
 </template>
 
